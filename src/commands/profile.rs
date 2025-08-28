@@ -1,7 +1,6 @@
-use crate::config::{config_path, Profile, save_profiles, load_profiles};
+use crate::config::{Profile, save_profiles, load_profiles};
 use std::collections::HashMap;
 use dialoguer::{Select, Input, Confirm};
-use std::io::{self, Write};
 
 pub fn list(_verbose: bool) {
     let profiles = super::super::config::load_profiles().unwrap_or_else(|err| {

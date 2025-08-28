@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use std::fs;
 use std::path::PathBuf;
 use dirs::config_dir;
-use dialoguer::{Select, Input, Confirm};
+use dialoguer::Select;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Profile {

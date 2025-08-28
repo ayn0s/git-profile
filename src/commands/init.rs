@@ -2,7 +2,6 @@ use crate::config::{load_profiles, prompt_profile};
 use std::process::Command;
 use std::collections::HashMap;
 use std::fs;
-use dialoguer::{Select, Input, Confirm};
 
 pub fn handle(name: Option<String>)  {
     let profiles = load_profiles().unwrap_or_else(|_| {
