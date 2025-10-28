@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: write # Ajout explicite des permissions pour créer des releases
+
 jobs:
   build:
     name: Build ${{ matrix.os }}
@@ -13,10 +16,8 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            artifact_name: gitp
             asset_name: gitp-linux-amd64
           - os: windows-latest
-            artifact_name: gitp.exe
             asset_name: gitp-windows-amd64.exe
 
     steps:
@@ -35,36 +36,45 @@ jobs:
           command: build
           args: --release
 
-      - name: Rename artifacts
+      - name: Prepare Release Asset
         shell: bash
         run: |
           if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            cp target/release/gitp.exe ${{ matrix.asset_name }}
+            cp "target/release/gitp.exe" "${{ matrix.asset_name }}"
           else
-            cp target/release/gitp ${{ matrix.asset_name }}
+            cp "target/release/gitp" "${{ matrix.asset_name }}"
+            chmod +x "${{ matrix.asset_name }}"
           fi
 
-      - name: Upload artifacts
+      - name: Upload Release Asset
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.asset_name }}
           path: ${{ matrix.asset_name }}
+          retention-days: 1
 
   release:
     name: Create Release
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     
     steps:
-      - name: Download artifacts
+      - name: Download all artifacts
         uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: List files
+        run: ls -R artifacts/
 
       - name: Create Release
-        id: create_release
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: |
-            gitp-linux-amd64
-            gitp-windows-amd64.exe
+            artifacts/gitp-linux-amd64
+            artifacts/gitp-windows-amd64.exe
