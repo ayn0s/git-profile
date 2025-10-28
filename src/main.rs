@@ -12,36 +12,26 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-
     #[command(name = "init")]
     Init { 
         #[arg(short, long)]
         name: Option<String>,
-
-        #[arg(long)]
-        force: bool,
     },
     
     #[command(name = "clone")]
     Clone {
         url: String,
-
-        #[arg(short, long)]
-        profile: Option<String>,
     },
     
     #[command(name = "profile")]
-    Profile{
+    Profile {
         #[command(subcommand)]
         subcommand: ProfileCommands,
     },
-    
 }
-
 
 #[derive(Subcommand)]
 pub enum ProfileCommands {
-    
     #[command(name = "list")]
     List {
         #[arg(long)]
@@ -52,8 +42,10 @@ pub enum ProfileCommands {
     Add {
         #[arg(short, long)]
         name: Option<String>,
+        
         #[arg(short, long)]
         email: Option<String>,
+        
         #[arg(long)]
         ssh: Option<String>,
     },
@@ -65,20 +57,17 @@ pub enum ProfileCommands {
     },
 }
 
-
 fn main() {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::Init { name, force } => commands::init::handle(name),
+        Commands::Init { name } => commands::init::handle(name),
         Commands::Profile { subcommand } => match subcommand {
             ProfileCommands::List { verbose } => commands::profile::list(verbose),
             ProfileCommands::Add { name, email, ssh } => commands::profile::add(name, email, ssh),
             ProfileCommands::Remove { name } => commands::profile::remove(name),
         },
-
-        Commands::Clone {url, profile } => commands::clone::handle(url)
-
+        Commands::Clone { url } => commands::clone::handle(url)
     }
 }
 
