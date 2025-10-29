@@ -28,6 +28,12 @@ enum Commands {
         #[command(subcommand)]
         subcommand: ProfileCommands,
     },
+
+    #[command(name = "use")]
+    Use {
+        #[arg(short, long)]
+        name: Option<String>,
+    },
 }
 
 #[derive(Subcommand)]
@@ -67,7 +73,8 @@ fn main() {
             ProfileCommands::Add { name, email, ssh } => commands::profile::add(name, email, ssh),
             ProfileCommands::Remove { name } => commands::profile::remove(name),
         },
-        Commands::Clone { url } => commands::clone::handle(url)
+        Commands::Clone { url } => commands::clone::handle(url),
+        Commands::Use { name } => commands::r#use::handle(name)
     }
 }
 

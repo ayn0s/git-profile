@@ -55,6 +55,17 @@ Remove a profile:
 gitp profile remove
 ```
 
+### Using Profiles
+
+Switch to a profile in current repository:
+```bash
+gitp use
+```
+You can also specify a profile directly:
+```bash
+gitp use --name work
+```
+
 ### Repository Operations
 
 Initialize a new repository:
