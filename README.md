@@ -2,6 +2,18 @@
 
 A command-line tool for managing multiple Git configurations efficiently.
 
+## Quick Install
+
+### Windows (PowerShell)
+```powershell
+irm https://raw.githubusercontent.com/ayn0s/git-profile/master/install.ps1 | iex
+```
+
+### Linux/macOS
+```bash
+curl -sSL https://raw.githubusercontent.com/ayn0s/git-profile/master/install.sh | bash
+```
+
 ## Overview
 
 `gitp` simplifies the management of multiple Git profiles by handling user configurations and SSH keys in a streamlined way. It's particularly useful for developers who need to switch between different Git identities for work, personal projects, or various organizations.
