@@ -25,8 +25,9 @@ pub fn handle(url: String)  {
 
     // Git clone with optional SSH key
     let status = if let Some(key) = &profile.ssh_key {
+        let key_path = key.replace('\\', "/");  // Ensure forward slashes for SSH
         Command::new(GIT_EXECUTABLE)
-            .env("GIT_SSH_COMMAND", format!("ssh -i {}", key))
+            .env("GIT_SSH_COMMAND", format!("ssh -i {}", key_path))
             .args(["clone", &url])
             .status()
     } else {

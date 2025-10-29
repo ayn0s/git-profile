@@ -52,7 +52,8 @@ pub fn list_ssh_keys() -> Vec<String> {
 
                     if is_ssh_private_key(&path) {
                         if let Some(path_str) = path.to_str() {
-                            keys.push(path_str.to_string());
+                            // Convert Windows path separators to forward slashes
+                            keys.push(path_str.replace('\\', "/"));
                         }
                     }
                 }
@@ -76,14 +77,17 @@ pub fn create_ssh_key(name: &str, comment: Option<&str>) -> std::io::Result<Stri
     fs::create_dir_all(&ssh_dir)?;
     
     let key_path = ssh_dir.join(format!("id_ed25519_{}", name));
-    let key_path_str = key_path.to_str().unwrap().to_string();
+    // Convert path to string with forward slashes
+    let key_path_str = key_path.to_str()
+        .map(|s| s.replace('\\', "/"))
+        .unwrap_or_default();
     
     let mut command = std::process::Command::new("ssh-keygen");
     command.args([
         "-t", "ed25519",
         "-f", &key_path_str,
         "-N", "",  // Empty passphrase
-        "-C", comment.unwrap_or(""),  // Commentaire vide par défaut
+        "-C", comment.unwrap_or(""),  // Empty comment by default
     ]);
 
     command.status()?;
