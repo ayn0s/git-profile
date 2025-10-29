@@ -51,8 +51,12 @@ pub fn handle(name: Option<String>) {
         }
 
         if let Some(ssh_key) = &profile.ssh_key {
+            // Convert path separators to forward slashes for SSH
+            let formatted_path = ssh_key.replace('\\', "/");
+            let ssh_command = format!("ssh -i \"{}\"", formatted_path);
+            
             let output = std::process::Command::new("git")
-                .args(["config", "core.sshCommand", &format!("ssh -i {}", ssh_key)])
+                .args(["config", "core.sshCommand", &ssh_command])
                 .output();
 
             if let Err(e) = output {
