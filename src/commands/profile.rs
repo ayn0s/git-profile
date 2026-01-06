@@ -1,6 +1,6 @@
-use crate::config::{Profile, save_profiles, load_profiles, list_ssh_keys, create_ssh_key};
+use crate::config::{Profile, create_ssh_key, list_ssh_keys, load_profiles, save_profiles};
+use dialoguer::{Confirm, Input, Select};
 use std::collections::HashMap;
-use dialoguer::{Input, Select, Confirm};
 
 pub fn list(_verbose: bool) {
     let profiles = super::super::config::load_profiles().unwrap_or_else(|err| {
@@ -10,7 +10,13 @@ pub fn list(_verbose: bool) {
     println!("Available profiles:");
 
     for (name, prof) in profiles.iter() {
-        println!("- {} → {} <{}> (Git name: {})", name, prof.email, prof.ssh_key.as_deref().unwrap_or("no SSH key"), prof.name);
+        println!(
+            "- {} → {} <{}> (Git name: {})",
+            name,
+            prof.email,
+            prof.ssh_key.as_deref().unwrap_or("no SSH key"),
+            prof.name
+        );
     }
 }
 
@@ -25,7 +31,7 @@ fn is_valid_email(email: &str) -> bool {
 }
 
 pub fn add(name: Option<String>, email: Option<String>, ssh: Option<String>) {
-    let profile_id = Input::new()
+    let profile_id: String = Input::new()
         .with_prompt("Profile name (used to select the profile)")
         .interact_text()
         .unwrap();
@@ -43,7 +49,7 @@ pub fn add(name: Option<String>, email: Option<String>, ssh: Option<String>) {
                 .with_prompt("Git email (will be used as user.email for commits)")
                 .interact_text()
                 .unwrap();
-            
+
             if is_valid_email(&input) {
                 break input;
             }
@@ -61,7 +67,11 @@ pub fn add(name: Option<String>, email: Option<String>, ssh: Option<String>) {
             .unwrap();
 
         if use_ssh {
-            let options = vec!["Use existing key", "Specify path manually", "Create new key"];
+            let options = vec![
+                "Use existing key",
+                "Specify path manually",
+                "Create new key",
+            ];
             let selection = Select::new()
                 .with_prompt("How would you like to add the SSH key?")
                 .items(&options)
@@ -84,12 +94,12 @@ pub fn add(name: Option<String>, email: Option<String>, ssh: Option<String>) {
                             .unwrap();
                         Some(existing_keys[key_index].clone())
                     }
-                },
+                }
                 1 => Some(
                     Input::new()
                         .with_prompt("Enter SSH key path")
                         .interact_text()
-                        .unwrap()
+                        .unwrap(),
                 ),
                 2 => {
                     let use_email = Confirm::new()
@@ -97,20 +107,23 @@ pub fn add(name: Option<String>, email: Option<String>, ssh: Option<String>) {
                         .default(false)
                         .interact()
                         .unwrap();
-                    
-                    match create_ssh_key(&git_name, if use_email { Some(&email) } else { None }) {
+
+                    match create_ssh_key(&profile_id, if use_email { Some(&email) } else { None }) {
                         Ok(key_path) => {
                             println!("[OK] Created new SSH key: {}", key_path);
-                            println!("Don't forget to add the public key ({}.pub) to your Git provider", key_path);
+                            println!(
+                                "Don't forget to add the public key ({}.pub) to your Git provider",
+                                key_path
+                            );
                             Some(key_path)
-                        },
+                        }
                         Err(e) => {
                             eprintln!("[Error] Failed to create SSH key: {}", e);
                             None
                         }
                     }
-                },
-                _ => None
+                }
+                _ => None,
             }
         } else {
             None
@@ -125,16 +138,14 @@ pub fn add(name: Option<String>, email: Option<String>, ssh: Option<String>) {
         println!("- SSH key: {}", key);
     }
 
-    let mut profiles = load_profiles().unwrap_or_else(|_| {
-        HashMap::new()
-    });
-    
-    let new_profile = Profile { 
+    let mut profiles = load_profiles().unwrap_or_else(|_| HashMap::new());
+
+    let new_profile = Profile {
         name: git_name,
         email,
-        ssh_key
+        ssh_key,
     };
-    
+
     profiles.insert(profile_id, new_profile);
     let _ = save_profiles(profiles);
 }
@@ -153,10 +164,7 @@ pub fn remove(name: Option<String>) {
     let selected_name = match name {
         Some(n) => n,
         None => {
-            let options: Vec<String> = profiles
-                .keys()
-                .cloned()
-                .collect();
+            let options: Vec<String> = profiles.keys().cloned().collect();
 
             let index = Select::new()
                 .with_prompt("Which profile do you want to delete?")
@@ -169,11 +177,12 @@ pub fn remove(name: Option<String>) {
     };
 
     if let Some(removed) = profiles.remove(&selected_name) {
-        println!("[OK] Profile '{}' (Git name: {}) deleted successfully.", selected_name, removed.name);
+        println!(
+            "[OK] Profile '{}' (Git name: {}) deleted successfully.",
+            selected_name, removed.name
+        );
         save_profiles(profiles).unwrap();
     } else {
         println!("[Error] Profile '{}' not found.", selected_name);
     }
 }
-
-
