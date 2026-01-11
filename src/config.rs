@@ -153,7 +153,7 @@ pub fn prompt_profile(profiles: &HashMap<String, Profile>) -> (&Profile, String)
 pub fn load_profiles() -> Result<HashMap<String, Profile>, std::io::Error> {
     let path = config_path();
 
-    if (!path.exists()) {
+    if !path.exists() {
         println!(
             "[Info] No profile file found, creating one at: '{}'",
             path.display()
