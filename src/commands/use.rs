@@ -20,10 +20,12 @@ pub fn use_profile(name: Option<String>) {
         if let Some(prof) = profiles.get(&n) {
             prof
         } else {
-            prompt_profile(&profiles)
+            let (_profile, _) = prompt_profile(&profiles);
+            _profile
         }
     } else {
-        prompt_profile(&profiles)
+        let (_profile, _) = prompt_profile(&profiles);
+        _profile
     };
 
     // Set Git config for current repository

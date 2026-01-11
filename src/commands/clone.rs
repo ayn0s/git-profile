@@ -21,7 +21,7 @@ pub fn handle(url: String) {
         return;
     }
 
-    let profile = prompt_profile(&profiles);
+    let (profile, profile_key) = prompt_profile(&profiles);
     let repo_name = extract_repo_name(&url);
     println!(
         "Cloning {} in {} using profile '{}'",
@@ -44,7 +44,7 @@ pub fn handle(url: String) {
         return;
     }
 
-    use_profile(Some(profile.name.clone()));
+    use_profile(Some(profile_key));
 
     println!(
         "[OK] Repository cloned successfully with the profile '{}'",

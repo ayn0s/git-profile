@@ -21,7 +21,7 @@ pub fn handle(name: Option<String>) {
         return;
     }
 
-    let profile = prompt_profile(&profiles);
+    let (profile, _) = prompt_profile(&profiles);
 
     let path = if let Some(name) = name {
         fs::create_dir_all(&name).unwrap();

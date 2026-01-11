@@ -1,5 +1,5 @@
-mod config;
 mod commands;
+mod config;
 
 use clap::{Parser, Subcommand};
 
@@ -13,16 +13,14 @@ struct Cli {
 #[derive(Subcommand)]
 enum Commands {
     #[command(name = "init")]
-    Init { 
+    Init {
         #[arg(short, long)]
         name: Option<String>,
     },
-    
+
     #[command(name = "clone")]
-    Clone {
-        url: String,
-    },
-    
+    Clone { url: String },
+
     #[command(name = "profile")]
     Profile {
         #[command(subcommand)]
@@ -48,10 +46,10 @@ pub enum ProfileCommands {
     Add {
         #[arg(short, long)]
         name: Option<String>,
-        
+
         #[arg(short, long)]
         email: Option<String>,
-        
+
         #[arg(long)]
         ssh: Option<String>,
     },
@@ -74,7 +72,6 @@ fn main() {
             ProfileCommands::Remove { name } => commands::profile::remove(name),
         },
         Commands::Clone { url } => commands::clone::handle(url),
-        Commands::Use { name } => commands::r#use::handle(name)
+        Commands::Use { name } => commands::r#use::handle(name),
     }
 }
-
